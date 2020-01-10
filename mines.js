@@ -121,8 +121,8 @@ const drawBoard = () => {
     if (youWin) {
       setAndGet.set("win");
       const title = document.getElementsByClassName("header")[0];
-      title.innerHTML =
-        '<div class="winner">YOU WIN! CLICK TO PLAY AGAIN</div>';
+      title.innerText = "YOU WIN! CLICK TO PLAY AGAIN";
+      title.className = "winner";
       drawBoard();
     }
   } else {
@@ -141,10 +141,12 @@ const drawBoard = () => {
     for (let j = 0; j < pigBoard.length; j++) {
       let td = document.createElement("td");
       let { value, x, y, hidden, flagged } = pigBoard[i][j];
+      console.log(flagged);
       if (value === 0) value = "";
       td.coords = { x, y };
       if (flagged) {
-        td.innerHTML = '<img class="flagged" src="./red-flag.png"/>';
+        // td.innerHTML = '<img class="flagged" src="./red-flag.png"/>';
+        td.classList.add("flagged");
       }
       if (!hidden && !flagged) {
         td.className = "visible";
@@ -164,7 +166,8 @@ const updateBoard = (x, y, cache = {}) => {
   if (pigBoard[y][x].value === "pig") {
     setAndGet.set("lose");
     const title = document.getElementsByClassName("header")[0];
-    title.innerHTML = '<div class="loser">YOU LOSE! CLICK TO TRY AGAIN</div>';
+    title.innerText = "YOU LOSE! CLICK TO TRY AGAIN";
+    title.className = "loser";
     drawBoard();
     title.addEventListener("click", () => {
       window.location.reload();
@@ -189,7 +192,10 @@ const updateBoard = (x, y, cache = {}) => {
 };
 
 const flagPig = (x, y) => {
-  pigBoard[y][x].flagged = true;
+  const isFlagged = pigBoard[y][x].flagged;
+  console.log(isFlagged);
+  pigBoard[y][x].flagged = !isFlagged;
+  //   drawBoard();
 };
 
 document.addEventListener("click", evt => {

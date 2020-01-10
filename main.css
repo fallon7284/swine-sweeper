@@ -18,7 +18,7 @@
 .loser {
   color: red;
   font-family: Minesweeper;
-  font-size: 50px;
+  font-size: 30px;
 }
 
 body {
@@ -26,12 +26,6 @@ body {
   flex-direction: column;
   justify-content: center;
   height: 100vh;
-}
-
-table {
-  display: table;
-  height: 80%;
-  width: 80%;
 }
 
 .container {
@@ -43,24 +37,27 @@ img {
   display: block;
   width: 100%;
   max-height: 100%;
-  object-fit: contain;
   background-color: rgb(184, 184, 184);
 }
 
 .flagged {
-  background-color: #909090;
+  background: #909090 url("./red-flag.png") no-repeat center;
+  background-size: contain;
 }
 
 table {
-  background-color: cornsilk;
-  border: 10px solid cornsilk;
+  display: table;
+  height: 60%;
+  width: 60%;
+  background-color: #e9e0e0;
+  border: 10px solid #e9e0e0;
   border-spacing: 10px;
   border-radius: 6px;
 }
 
 td {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   background-color: #909090;
   border-radius: 4px;
   margin: 5px;
