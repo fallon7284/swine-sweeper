@@ -64,6 +64,7 @@ td {
   border-radius: 4px;
   margin: 5px;
   -webkit-box-shadow: 0 10px 6px -6px #777;
+  box-shadow: 0 10px 6px -6px #777;
   color: cornsilk;
   font-family: Minesweeper;
   font-size: 15px;
