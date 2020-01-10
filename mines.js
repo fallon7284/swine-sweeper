@@ -1,8 +1,8 @@
 const board = document.getElementsByTagName("table")[0];
-const boardSize = 12;
+const boardSize = 14;
 
 const generatePigCoords = size => {
-  let numberOfPigs = Math.floor(size * size * 0.08);
+  let numberOfPigs = Math.floor(size * size * 0.13);
   const pigList = {};
   const pigCoords = [];
   const createCoordVal = () => {
@@ -123,6 +123,9 @@ const drawBoard = () => {
       const title = document.getElementsByClassName("header")[0];
       title.innerText = "YOU WIN! CLICK TO PLAY AGAIN";
       title.className = "winner";
+      title.addEventListener("click", () => {
+        window.location.reload();
+      });
       drawBoard();
     }
   } else {
