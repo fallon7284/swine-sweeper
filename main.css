@@ -1,11 +1,13 @@
 * {
   text-align: center;
   background-color: antiquewhite;
+  font-family: Minesweeper;
+  color: #404040;
+  align-items: center;
 }
 
 .header {
   color: #404040;
-  font-family: Minesweeper;
   font-size: 4em;
 }
 
@@ -48,7 +50,7 @@ img {
 table {
   display: table;
   height: 60%;
-  width: 60%;
+  width: 60vw;
   background-color: #e9e0e0;
   border: 10px solid #e9e0e0;
   border-spacing: 10px;
@@ -82,6 +84,14 @@ td {
 }
 .brown {
   color: rgb(61, 13, 1);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 @font-face {
