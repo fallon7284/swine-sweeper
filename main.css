@@ -57,6 +57,10 @@ table {
   border-radius: 6px;
 }
 
+.iframe {
+  background-color: white;
+}
+
 td {
   width: 30px;
   height: 30px;
