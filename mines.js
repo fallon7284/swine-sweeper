@@ -248,6 +248,13 @@ const sizeSelector = document.getElementById("size-select");
 difficultySelector.addEventListener("change", handleSettingsChange);
 sizeSelector.addEventListener("change", handleSettingsChange);
 
+const body = document.getElementsByTagName("body")[0];
+
+if (window.location !== window.parent.location) {
+  body.classList.add("iframe");
+  board.classList.add("iframe");
+}
+
 const newGame = new SweeperGame(sizeSelector.value, difficultySelector.value);
 console.log(newGame);
 newGame.initializeGame();
