@@ -134,6 +134,10 @@ class SweeperGame {
     const title = document.getElementsByClassName("header")[0];
     title.innerText = "YOU LOSE! CLICK TO TRY AGAIN";
     title.classList.add("loser");
+    console.log(this.size, this.difficulty);
+    title.addEventListener("click", () => {
+      this.changeBoard(this.size, this.difficulty);
+    });
   }
   winGame() {
     this.setStatus("win");
@@ -141,7 +145,7 @@ class SweeperGame {
     title.innerText = "YOU WIN! CLICK TO PLAY AGAIN";
     title.classList.add("winner");
     title.addEventListener("click", () => {
-      window.location.reload();
+      this.changeBoard(this.size, this.difficulty);
     });
   }
   updateBoard = (x, y, cache = {}) => {
@@ -152,7 +156,7 @@ class SweeperGame {
       this.drawBoard();
       const title = document.getElementsByClassName("header")[0];
       title.addEventListener("click", () => {
-        window.location.reload();
+        this.changeBoard(this.size, this.difficulty);
       });
     }
     if (this.board[y][x].value === 0) {
