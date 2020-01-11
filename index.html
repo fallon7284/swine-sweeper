@@ -11,7 +11,19 @@
     <div class="header">Swine Sweeper</div>
     <div class="container">
       <table></table>
-      <div>Shift + click to add/remove flag.</div>
+      <div id="bottom">
+        <select id="difficulty-select">
+          <option value=".1">Easy</option>
+          <option value=".13">Moderate</option>
+          <option value=".17">Difficult</option>
+        </select>
+        <div>Shift + click to add/remove flag.</div>
+        <select id="size-select">
+          <option value="8">Small</option>
+          <option value="10">Medium</option>
+          <option value="12">Large</option>
+        </select>
+      </div>
     </div>
   </body>
   <script src="mines.js"></script>
