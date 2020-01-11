@@ -50,9 +50,9 @@ img {
 table {
   display: table;
   height: 60%;
-  width: 60vw;
+  width: 65vw;
   background-color: #e9e0e0;
-  border: 10px solid #e9e0e0;
+  /* border: 10px solid #e9e0e0; */
   border-spacing: 10px;
   border-radius: 6px;
 }
@@ -92,6 +92,14 @@ td {
   flex-direction: column;
   font-size: 15px;
   justify-content: center;
+  margin-top: 10px;
+}
+
+#bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 65vw;
   margin-top: 10px;
 }
 
