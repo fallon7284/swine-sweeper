@@ -249,16 +249,16 @@ difficultySelector.addEventListener("change", handleSettingsChange);
 sizeSelector.addEventListener("change", handleSettingsChange);
 
 const body = document.getElementsByTagName("body")[0];
-const html = document.getElementsByTagName("html")[0];
-const header = document.getElementById("header");
-const bottom = document.getElementByID("bottom");
+// const html = document.getElementsByTagName("html")[0];
+// const header = document.getElementById("header");
+// const bottom = document.getElementByID("bottom");
 
 if (window.location !== window.parent.location) {
   body.classList.add("iframe");
   board.classList.add("iframe");
-  html.classList.add("iframe");
-  header.classList.add("iframe");
-  bottom.classList.add("iframe");
+  //   html.classList.add("iframe");
+  //   header.classList.add("iframe");
+  //   bottom.classList.add("iframe");
 }
 
 const newGame = new SweeperGame(sizeSelector.value, difficultySelector.value);
