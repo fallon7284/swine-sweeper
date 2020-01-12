@@ -1,6 +1,6 @@
 * {
   text-align: center;
-  background-color: antiquewhite;
+  background-color: white;
   font-family: Minesweeper;
   color: #404040;
   align-items: center;
@@ -51,7 +51,7 @@ table {
   display: table;
   height: 60%;
   width: 65vw;
-  background-color: #e9e0e0;
+  background-color: white;
   /* border: 10px solid #e9e0e0; */
   border-spacing: 10px;
   border-radius: 6px;
