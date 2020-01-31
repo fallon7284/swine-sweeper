@@ -11,6 +11,13 @@
   font-size: 4em;
 }
 
+.play-again {
+  color: #404040;
+  font-size: 1.5em;
+  cursor: pointer;
+  animation: glow 0.5s ease-in-out infinite alternate;
+}
+
 .winner {
   color: #1c5992;
   font-family: Minesweeper;
@@ -115,4 +122,13 @@ td {
 @font-face {
   font-family: Minesweeper;
   src: url(/mine-sweeper.ttf);
+}
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #f198c5;
+  }
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 20px #f198c5, 0 0 20px #f198c5;
+  }
 }
