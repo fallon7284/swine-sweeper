@@ -11,7 +11,7 @@
   font-size: 4em;
 }
 
-.play-again {
+#play-again {
   color: #404040;
   font-size: 1.5em;
   cursor: pointer;
