@@ -1,266 +1,185 @@
-class SweeperGame {
-  constructor(size, difficulty) {
+class GridNode {
+  constructor(x, y, isPig = false) {
+    this.x = x;
+    this.y = y;
+    this.isPig = isPig;
+    this.neighbors = [];
+    this.visible = false;
+  }
+  getValue() {
+    return this.isPig
+      ? "pig"
+      : this.neighbors.reduce((accum, cell) => {
+          let val = cell.isPig ? 1 : 0;
+          return accum + val;
+        }, 0);
+  }
+}
+
+class Game {
+  constructor(size = 10, difficulty = 10) {
+    this.grid = [];
     this.size = size;
     this.difficulty = difficulty;
     this.status = "continue";
-    this.board = [];
-    this.pigObject = {};
+    this.table = null;
+    this.playAgain = document.getElementById("play-again");
+    this.header = document.getElementsByClassName("header")[0];
+    this.difficultySelector = null;
+    this.sizeSelector = null;
+    this.loseAudio = new Audio("lose.mp3");
+    this.winAudio = new Audio("win.mp3");
   }
-  setStatus(status) {
-    this.status = status;
-  }
-  getStatus() {
-    return this.status;
-  }
-  calculateNeighborPigs = (x, y, pigs, size) => {
-    const neighbors = this.generateValidNeighborsList(x, y, size);
-    let sum = 0;
-    for (let i = 0; i < neighbors.length; i++) {
-      const { x, y } = neighbors[i];
-      if (pigs[`x${x}y${y}`]) {
-        sum++;
+  insert(newNode) {
+    for (let i = 0; i < this.grid.length; i++) {
+      const currentNode = this.grid[i];
+      const { x, y } = currentNode;
+      if (Math.abs(x - newNode.x) <= 1 && Math.abs(y - newNode.y) <= 1) {
+        newNode.neighbors.push(currentNode);
+        currentNode.neighbors.push(newNode);
       }
     }
-    return sum;
-  };
-  generateValidNeighborsList = (x, y) => {
-    let neighbors = [
-      { x: -1, y: -1 },
-      { x: -1, y: 0 },
-      { x: -1, y: 1 },
-      { x: 0, y: -1 },
-      { x: 0, y: 1 },
-      { x: 1, y: -1 },
-      { x: 1, y: 0 },
-      { x: 1, y: 1 }
-    ];
-    return neighbors
-      .map(item => {
-        item.x += x;
-        item.y += y;
-        return item;
-      })
-      .filter(item => {
-        return (
-          item.x >= 0 && item.y >= 0 && item.x < this.size && item.y < this.size
-        );
-      });
-  };
-  setupClickListener(evt, game) {
-    if (evt.target.localName === "td") {
-      const { x, y } = event.target.coords;
-      if (evt.shiftKey) {
-        game.flagPig(x, y);
-      } else {
-        game.updateBoard(x, y);
-      }
-      game.drawBoard();
+    this.grid.push(newNode);
+  }
+  initialize() {
+    this.header.innerText = "Swine Sweeper";
+    this.playAgain.innerText = "";
+    let tableDiv = document.getElementById("table-div");
+    while (tableDiv.hasChildNodes()) {
+      tableDiv.removeChild(tableDiv.firstChild);
     }
+    let table = document.createElement("table");
+    tableDiv.appendChild(table);
+    this.table = document.getElementsByTagName("table")[0];
+    this.table.addEventListener("click", this.click.bind(this));
+    for (let y = 0; y < this.size; y++) {
+      for (let x = 0; x < this.size; x++) {
+        let isPig = Math.floor(Math.random() * 100) < this.difficulty;
+        this.insert(new GridNode(x, y, isPig));
+      }
+    }
+    this.drawTable(this.status);
   }
-  endGame() {
-    document.removeEventListener("click", this.setupClickListener);
-  }
-  changeBoard(size, difficulty) {
-    this.endGame();
-    this.setStatus("continue");
-    const title = document.getElementsByClassName("header")[0];
-    title.classList.remove("winner", "loser");
-    title.innerText = "Swine Sweeper";
-    this.size = size;
-    this.difficulty = difficulty;
-    this.pigObject = {};
-    this.board = [];
-    this.initializeGame();
-  }
-  initializeGame() {
-    document.addEventListener("click", evt =>
-      this.setupClickListener(evt, this)
-    );
-    const createBoardArray = () => {
-      const generatePigCoords = () => {
-        let numberOfPigs = Math.floor(this.size * this.size * this.difficulty);
-        const createCoordVal = () => {
-          return Math.floor(Math.random() * this.size);
-        };
-        const crossCheckPig = (x, y) => {
-          if (this.pigObject[`x${x}y${y}`]) {
-            return false;
-          } else {
-            this.pigObject[`x${x}y${y}`] = true;
-            return true;
+  click(evt, x, y, cache = {}) {
+    if (!cache[`x${x}y${y}`]) {
+      cache[`x${x}y${y}`] = true;
+      if (!evt || evt.target.localName === "td") {
+        if (evt) {
+          x = evt.target.x;
+          y = evt.target.y;
+        }
+        let idx = x + y * this.size;
+        let clickedNode = this.grid[idx];
+        if (evt && evt.shiftKey) {
+          clickedNode.flagged = !clickedNode.flagged;
+          let win = true;
+          for (let i = 0; i < this.grid.length; i++) {
+            let { flagged, isPig } = this.grid[i];
+            if ((flagged && !isPig) || (isPig && !flagged)) {
+              win = false;
+            }
           }
-        };
-        for (let i = 0; i < numberOfPigs; i++) {
-          let validPigCoord = false;
-          let x;
-          let y;
-          while (!validPigCoord) {
-            x = createCoordVal();
-            y = createCoordVal();
-            if (crossCheckPig(x, y)) {
-              validPigCoord = true;
+          if (win) {
+            this.status = "win";
+            this.winAudio.play();
+          }
+        } else {
+          if (!clickedNode.flagged) {
+            clickedNode.visible = true;
+            if (clickedNode.getValue() === 0) {
+              for (let i = 0; i < clickedNode.neighbors.length; i++) {
+                let neighbor = clickedNode.neighbors[i];
+                neighbor.visible = true;
+                if (neighbor.getValue() === 0) {
+                  this.click(null, neighbor.x, neighbor.y, cache);
+                }
+              }
+            }
+            if (clickedNode.isPig) {
+              this.status = "lose";
+              this.loseAudio.play();
             }
           }
         }
-      };
-      generatePigCoords();
-      for (let y = 0; y < this.size; y++) {
-        let row = [];
-        for (let x = 0; x < this.size; x++) {
-          if (this.pigObject[`x${x}y${y}`]) {
-            row.push({ value: "pig", hidden: true, x, y, flagged: false });
-          } else {
-            row.push({
-              value: this.calculateNeighborPigs(
-                x,
-                y,
-                this.pigObject,
-                this.size
-              ),
-              hidden: true,
-              flagged: false,
-              x,
-              y
-            });
-          }
-        }
-        this.board.push(row);
       }
-    };
-    createBoardArray();
-    this.drawBoard();
+    }
+    this.drawTable(this.status);
   }
-  loseGame() {
-    const title = document.getElementsByClassName("header")[0];
-    title.innerText = "YOU LOSE! CLICK TO TRY AGAIN";
-    title.classList.add("loser");
-    console.log(this.size, this.difficulty);
-    title.addEventListener("click", () => {
-      this.changeBoard(this.size, this.difficulty);
+  itsOver() {
+    this.grid.forEach(el => {
+      el.visible = true;
     });
+    this.header.innerText = `YOU ${this.status.toUpperCase()}`;
+    this.drawTable("continue");
+    this.playAgain.innerText = "Play Again?";
   }
-  winGame() {
-    this.setStatus("win");
-    const title = document.getElementsByClassName("header")[0];
-    title.innerText = "YOU WIN! CLICK TO PLAY AGAIN";
-    title.classList.add("winner");
-    title.addEventListener("click", () => {
-      this.changeBoard(this.size, this.difficulty);
-    });
-  }
-  updateBoard = (x, y, cache = {}) => {
-    this.board[y][x].hidden = false;
-    if (this.board[y][x].value === "pig") {
-      this.setStatus("lose");
-      this.loseGame();
-      this.drawBoard();
-      const title = document.getElementsByClassName("header")[0];
-      title.addEventListener("click", () => {
-        this.changeBoard(this.size, this.difficulty);
-      });
-    }
-    if (this.board[y][x].value === 0) {
-      const neighbors = this.generateValidNeighborsList(x, y);
-      for (let i = 0; i < neighbors.length; i++) {
-        let currentX = neighbors[i].x;
-        let currentY = neighbors[i].y;
-        let currentBoardObject = this.board[currentY][currentX];
-        currentBoardObject.hidden = false;
-        if (
-          currentBoardObject.value === 0 &&
-          !cache[`x${currentX}y${currentY}`]
-        ) {
-          cache[`x${currentX}y${currentY}`] = true;
-          this.updateBoard(currentBoardObject.x, currentBoardObject.y, cache);
+  drawTable(status) {
+    if (status === "continue") {
+      this.table.removeEventListener("click", this.click);
+      while (this.table.hasChildNodes()) {
+        this.table.removeChild(this.table.firstChild);
+      }
+      let currentRow;
+      for (let i = 0; i < this.grid.length; i++) {
+        if (i % this.size === 0) {
+          let tr = document.createElement("tr");
+          this.table.appendChild(tr);
+          let rows = document.getElementsByTagName("tr");
+          currentRow = rows[rows.length - 1];
         }
-      }
-    }
-  };
-  flagPig = (x, y) => {
-    const isFlagged = this.board[y][x].flagged;
-    this.board[y][x].flagged = !isFlagged;
-  };
-  drawBoard() {
-    const classColor = ["blue", "green", "red", "brown"];
-    if (this.getStatus() === "continue") {
-      let youWin = true;
-      for (let i = 0; i < this.board.length; i++) {
-        for (let j = 0; j < this.board[i].length; j++) {
-          const currentCell = this.board[i][j];
-          if (
-            (currentCell.hidden === true && currentCell.value !== "pig") ||
-            (currentCell.flagged === true && currentCell.value !== "pig") ||
-            (currentCell.value === "pig" && !currentCell.flagged)
-          ) {
-            youWin = false;
-          }
-        }
-      }
-      if (youWin) {
-        this.winGame();
-        this.drawBoard();
-      }
-    } else {
-      for (let i = 0; i < this.board.length; i++) {
-        for (let j = 0; j < this.board[i].length; j++) {
-          this.board[i][j].hidden = false;
-          this.board[i][j].flagged = false;
-        }
-      }
-    }
-    while (board.hasChildNodes()) {
-      board.removeChild(board.firstChild);
-    }
-    for (let i = 0; i < this.board.length; i++) {
-      const tr = document.createElement("tr");
-      for (let j = 0; j < this.board.length; j++) {
         let td = document.createElement("td");
-        let { value, x, y, hidden, flagged } = this.board[i][j];
-        if (value === 0) value = "";
-        td.coords = { x, y };
-        if (flagged) {
+        td.x = this.grid[i].x;
+        td.y = this.grid[i].y;
+        if (this.grid[i].flagged) {
           td.classList.add("flagged");
         }
-        if (!hidden && !flagged) {
-          td.className = "visible";
-          if (value === "pig") {
+        if (this.grid[i].visible) {
+          td.classList.add("visible");
+          if (this.grid[i].isPig) {
             td.innerHTML = '<img src="./pig.png"/>';
-          } else td.innerText = value;
-          td.classList.add(classColor[value - 1]);
+          } else if (this.grid[i].getValue() > 0) {
+            td.classList.add(
+              ["blue", "green", "red", "brown"][this.grid[i].getValue() - 1]
+            );
+            const value = this.grid[i].getValue();
+            td.innerText = value === 0 ? "" : value;
+          }
         }
-        tr.appendChild(td);
+        currentRow.appendChild(td);
       }
-      board.appendChild(tr);
+    } else {
+      this.itsOver();
     }
   }
 }
 
-const handleSettingsChange = evt => {
-  while (board.hasChildNodes()) {
-    board.removeChild(board.firstChild);
-  }
-  newGame.endGame();
-  newGame.changeBoard(sizeSelector.value, difficultySelector.value);
+let size;
+let difficulty;
+let board;
+
+const sizeChange = evt => {
+  size = evt.target.value;
+  startGame(null, size, difficulty);
 };
-const board = document.getElementsByTagName("table")[0];
-const difficultySelector = document.getElementById("difficulty-select");
-const sizeSelector = document.getElementById("size-select");
-difficultySelector.addEventListener("change", handleSettingsChange);
-sizeSelector.addEventListener("change", handleSettingsChange);
 
-const body = document.getElementsByTagName("body")[0];
-// const html = document.getElementsByTagName("html")[0];
-// const header = document.getElementById("header");
-// const bottom = document.getElementByID("bottom");
+const difficultyChange = evt => {
+  difficulty = evt.target.value;
+  startGame(null, size, difficulty);
+};
 
-if (window.location !== window.parent.location) {
-  body.classList.add("iframe");
-  board.classList.add("iframe");
-  //   html.classList.add("iframe");
-  //   header.classList.add("iframe");
-  //   bottom.classList.add("iframe");
-}
+difficultySelector = document.getElementById("difficulty-select");
+sizeSelector = document.getElementById("size-select");
+difficultySelector.addEventListener("change", difficultyChange);
+sizeSelector.addEventListener("change", sizeChange);
 
-const newGame = new SweeperGame(sizeSelector.value, difficultySelector.value);
-console.log(newGame);
-newGame.initializeGame();
+const startGame = (e, s, d) => {
+  board = new Game(s || sizeSelector.value, d || difficultySelector.value);
+  console.log(board);
+  board.initialize();
+  console.log(board.grid[0]);
+};
+
+const playAgain = document.getElementById("play-again");
+playAgain.addEventListener("click", startGame);
+
+startGame();
